@@ -1,0 +1,39 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test-app-ns
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-app
+  namespace: test-app-ns
+spec:
+  type: LoadBalancer
+  loadBalancerSourceRanges:
+  - 0.0.0.0/0
+  ports:
+  - name: test-port
+    port: 80
+    protocol: TCP
+  selector:
+    app: test-app
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: test-app-rc
+  namespace: test-app-ns
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: test-app
+    spec:
+      containers:
+      - name: test-app
+        image: vbcontainerregistry.azurecr.io/test-app
+        ports:
+        - containerPort: 80
